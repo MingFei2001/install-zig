@@ -62,3 +62,4 @@ fi
 
 # Verify Zig installation
 zig version || { echo "ERROR: Zig installation failed!"; exit 1; }
+echo "Zig is successfully installed and accessible."
