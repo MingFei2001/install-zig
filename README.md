@@ -26,6 +26,7 @@ Now run `zig version` to verify the installation.
 
 The script skips installation if the required version is already present. Edit the `ZIG_REQUIRED_VERSION` variable in the script to change the target version.
 
+## Credits
 *Script adapted from [JustAGuyLinux](https://github.com/drewgrif/myghostty)*
 
 ## License
