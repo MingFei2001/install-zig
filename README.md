@@ -25,7 +25,8 @@ bash ./install-zig.sh
 The script skips installation if the required version is already present. Edit the `ZIG_REQUIRED_VERSION` variable in the script to change the target version.
 
 ## Credits
-*Script adapted from [JustAGuyLinux](https://github.com/drewgrif/myghostty)*
+*Script adapted from [drewgrif/myghostty](https://github.com/drewgrif/myghostty)* \
+*YouTube Channel Link: [JustAGuyLinux](https://www.youtube.com/@JustAGuyLinux)*
 
 ## License
 This project is released under the [MIT License](./LICENSE). Feel free to use, modify, and distribute as needed.
