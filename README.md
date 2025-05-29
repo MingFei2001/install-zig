@@ -17,8 +17,6 @@ cd install-zig
 bash ./install-zig.sh
 ```
 
-Now run `zig version` to verify the installation.
-
 ## What it installs
 
 - Latest Zig version to `/usr/local/zig/`
