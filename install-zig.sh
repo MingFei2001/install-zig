@@ -17,8 +17,16 @@
 ##########################################################
 
 # Create a temporary directory for the build
+cleanup() {
+    echo "Cleaning up temporary directory: $TMP_DIR"
+    rm -rf "$TMP_DIR"
+}
+
 TMP_DIR=$(mktemp -d)
 echo "Using temporary directory: $TMP_DIR"
+
+# Register cleanup function to run on exit
+trap cleanup EXIT
 
 # Check if Zig is installed and at least version 0.13.0
 ZIG_REQUIRED_VERSION="0.15.2"
