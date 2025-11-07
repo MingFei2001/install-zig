@@ -77,13 +77,39 @@ else
     fi
 
     # grab the zig binary package from the official url
-    ZIG_URL="https://ziglang.org/download/$ZIG_REQUIRED_VERSION/zig-linux-x86_64-$ZIG_REQUIRED_VERSION.tar.xz"
-    wget "$ZIG_URL" || { echo "ERROR: Wget download failed! Check URL or network connection."; exit 1; }
+    ZIG_ARCHIVE_NAME="zig-x86_64-linux-$ZIG_REQUIRED_VERSION.tar.xz"
+    ZIG_URL="https://ziglang.org/download/$ZIG_REQUIRED_VERSION/$ZIG_ARCHIVE_NAME"
+    echo "Attempting to download Zig from: $ZIG_URL using $DOWNLOADER..."
+    if [[ "$DOWNLOADER" == "wget" ]]; then
+        wget "$ZIG_URL" -O "$ZIG_ARCHIVE_NAME" || { echo "ERROR: Wget download failed! Check URL or network connection or if the version ($ZIG_REQUIRED_VERSION) is correct."; exit 1; }
+    elif [[ "$DOWNLOADER" == "curl" ]]; then
+        # -L follows redirects, -o specifies output file
+        curl -L -o "$ZIG_ARCHIVE_NAME" "$ZIG_URL" || { echo "ERROR: Curl download failed! Check URL or network connection or if the version ($ZIG_REQUIRED_VERSION) is correct."; exit 1; }
+    fi
 
-    # unpack the archive and move it to system PATH
-    tar -xf "zig-linux-x86_64-$ZIG_REQUIRED_VERSION.tar.xz"
-    sudo mv "zig-linux-x86_64-$ZIG_REQUIRED_VERSION" /usr/local/zig
-    sudo ln -sf /usr/local/zig/zig /usr/local/bin/zig
+    # unpack the archive
+    tar -xf "$ZIG_ARCHIVE_NAME" || { echo "ERROR: Failed to extract archive '$ZIG_ARCHIVE_NAME'!"; exit 1; }
+
+    # Find the extracted directory dynamically
+    EXTRACTED_DIR=$(find "$TMP_DIR" -maxdepth 1 -type d -name "zig-*-linux-*" -print -quit)
+    if [[ -z "$EXTRACTED_DIR" ]]; then
+        echo "ERROR: Could not find extracted Zig directory matching 'zig-*-linux-*' in $TMP_DIR after extraction."
+        exit 1
+    fi
+
+    # Extract just the name of the directory
+    EXTRACTED_DIR_NAME=$(basename "$EXTRACTED_DIR")
+
+    # Remove existing /usr/local/zig if it exists to ensure a clean install
+    if [ -d "/usr/local/zig" ]; then
+        echo "Removing existing Zig installation at /usr/local/zig..."
+        sudo rm -rf /usr/local/zig || { echo "ERROR: Failed to remove old Zig installation!"; exit 1; }
+    fi
+
+    # Move it to system PATH
+    echo "Moving '$EXTRACTED_DIR_NAME' to /usr/local/zig..."
+    sudo mv "$EXTRACTED_DIR_NAME" /usr/local/zig || { echo "ERROR: Failed to move Zig directory to /usr/local/zig! Check permissions."; exit 1; }
+    sudo ln -sf /usr/local/zig/zig /usr/local/bin/zig || { echo "ERROR: Failed to create symlink /usr/local/bin/zig -> /usr/local/zig/zig! Check permissions."; exit 1; }
 
     echo "Zig $ZIG_REQUIRED_VERSION installed successfully."
 fi
