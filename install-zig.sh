@@ -21,23 +21,43 @@ TMP_DIR=$(mktemp -d)
 echo "Using temporary directory: $TMP_DIR"
 
 # Check if Zig is installed and at least version 0.13.0
-ZIG_REQUIRED_VERSION="0.15.1"
+ZIG_REQUIRED_VERSION="0.15.2"
 
 # Function to check zig version
 check_zig_version() {
     local installed_version
     installed_version=$(zig version 2>/dev/null || echo "0.0.0")
-    # if [ "$(printf '%s\n' "$ZIG_REQUIRED_VERSION" "$installed_version" | sort -V | head -n1)" == "$ZIG_REQUIRED_VERSION" ]; then
-    if [ "$(printf '%s\n' "$installed_version" "$ZIG_REQUIRED_VERSION" | sort -V | head -n1)" = "$ZIG_REQUIRED_VERSION" ] && [ "$installed_version" != "$ZIG_REQUIRED_VERSION" ]; then
-        return 1
+    # Use the version_compare function to determine if an upgrade is needed.
+    # It returns -1 if installed < required, 0 if installed = required, and 1 if installed > required.
+    # We need an upgrade if installed < required (version_compare returns -1).
+    case $(version_compare "$installed_version" "$ZIG_REQUIRED_VERSION") in
+        -1) return 1 ;; # Installed version is less than required, so an upgrade/install is needed.
+        *) return 0 ;;  # Installed version is sufficient (equal or greater).
+    esac
+}
+
+# Function to compare two version strings (e.g., "0.15.0", "0.15.1")
+# Returns: -1 if v1 < v2, 0 if v1 = v2, 1 if v1 > v2
+version_compare() {
+    if [[ -z "$1" || -z "$2" ]]; then
+        echo "ERROR: version_compare requires two arguments." >&2
+        exit 1
+    fi
+    local v1=$1
+    local v2=$2
+
+    if printf '%s\n' "$v1" "$v2" | sort -V | head -n1 | grep -q "$v1"; then
+        [[ "$v1" = "$v2" ]] && echo 0 || echo -1
     else
-        return 0
+        echo 1
     fi
 }
 
 # Main Function
 if command -v zig &> /dev/null && check_zig_version; then
     echo "Zig $ZIG_REQUIRED_VERSION or higher is already installed."
+    # Exit cleanly as no action is needed
+    exit 0
 else
     echo "Downloading and installing Zig $ZIG_REQUIRED_VERSION..."
     cd "$TMP_DIR"
