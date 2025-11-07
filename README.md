@@ -9,7 +9,7 @@
 
 ## 🚀 Quick Start
 
-Make sure your system have `sudo`, `git` and `wget` to begin. Next, run the following code below to install.
+Make sure your system has `sudo`, `git` and either `wget` or `curl` to begin. Next, run the following code below to install.
 
 ```bash
 git clone https://github.com/MingFei2001/install-zig.git
