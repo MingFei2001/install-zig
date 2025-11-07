@@ -21,7 +21,7 @@ TMP_DIR=$(mktemp -d)
 echo "Using temporary directory: $TMP_DIR"
 
 # Check if Zig is installed and at least version 0.13.0
-ZIG_REQUIRED_VERSION="0.13.0"
+ZIG_REQUIRED_VERSION="0.15.1"
 
 # Function to check zig version
 check_zig_version() {
