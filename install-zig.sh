@@ -70,9 +70,14 @@ else
     echo "Downloading and installing Zig $ZIG_REQUIRED_VERSION..."
     cd "$TMP_DIR"
 
-    # make sure wget is installed
-    if ! command -v wget &> /dev/null; then
-        echo "ERROR: 'wget' is not installed. Please install it or use 'curl'."
+    # Determine which download tool is available (wget or curl)
+    local DOWNLOADER=""
+    if command -v wget &> /dev/null; then
+        DOWNLOADER="wget"
+    elif command -v curl &> /dev/null; then
+        DOWNLOADER="curl"
+    else
+        echo "ERROR: Neither 'wget' nor 'curl' is installed. Please install one of them manually or ensure it's in your PATH."
         exit 1
     fi
 
